@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EasyFood - Gestão de Restaurantes</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --paper: #FBF6EE;
+            --ink: #2A2118;
+            --ink-soft: #6B5D4F;
+            --tomato: #E4572E;
+            --tomato-deep: #C8431E;
+            --sage: #5C7A52;
+            --mustard: #E3A63E;
+            --line: #E3D9C6;
+            --card: #FFFFFF;
+            --radius: 14px;
+            font-family: 'Work Sans', sans-serif;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            background: var(--paper);
+            color: var(--ink);
+            margin: 0;
+            padding: 0 20px 60px;
+            padding-top: env(safe-area-inset-top, 0px);
+            line-height: 1.5;
+        }
+
+        .container { max-width: 960px; margin: 0 auto; }
+
+        header.hero {
+            padding: 48px 0 32px;
+            border-bottom: 1px solid var(--line);
+            margin-bottom: 32px;
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            gap: 24px;
+            flex-wrap: wrap;
+        }
+
+        header.hero .mark {
+            font-family: 'Fraunces', serif;
+            font-weight: 600;
+            font-size: 2.6rem;
+            color: var(--ink);
+            margin: 0;
+            letter-spacing: -0.01em;
+        }
+
+        header.hero .mark span { color: var(--tomato); }
+
+        header.hero p.tagline {
+            margin: 6px 0 0;
+            color: var(--ink-soft);
+            font-size: 1.02rem;
+            max-width: 34ch;
+        }
+
+        .session-pill {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: var(--card);
+            border: 1px solid var(--line);
+            border-radius: 999px;
+            padding: 8px 8px 8px 18px;
+            font-size: 0.9rem;
+            color: var(--ink-soft);
+        }
+
+        .session-pill button {
+            border-radius: 999px;
+            padding: 8px 16px;
+        }
+
+        .layout {
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            gap: 28px;
+            align-items: start;
+        }
+
+        @media (max-width: 820px) {
+            .layout { grid-template-columns: 1fr; }
+        }
+
+        .panel {
+            background: var(--card);
+            border: 1px solid var(--line);
+            border-radius: var(--radius);
+            padding: 22px;
+        }
+
+        .panel + .panel { margin-top: 20px; }
+
+        .panel h2 {
+            font-family: 'Fraunces', serif;
+            font-weight: 600;
+            font-size: 1.15rem;
+            margin: 0 0 16px;
+            color: var(--ink);
+        }
+
+        .field { margin-bottom: 12px; }
+        .field label {
+            display: block;
+            font-size: 0.82rem;
+            color: var(--ink-soft);
+            margin-bottom: 5px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-family: inherit;
+            background: var(--paper);
+            color: var(--ink);
+            outline: none;
+        }
+
+        input:focus, select:focus, button:focus-visible {
+            border-color: var(--tomato);
+            box-shadow: 0 0 0 3px rgba(228, 87, 46, 0.15);
+        }
+
+        button {
+            background: var(--tomato);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 16px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            transition: background 0.15s ease;
+        }
+
+        button:hover { background: var(--tomato-deep); }
+
+        button.link-btn {
+            background: none;
+            color: var(--tomato-deep);
+            padding: 0;
+            font-weight: 500;
+            text-decoration: underline;
+            text-underline-offset: 3px;
+        }
+        button.link-btn:hover { background: none; color: var(--tomato); }
+
+        button.ghost {
+            background: transparent;
+            color: var(--ink-soft);
+            border: 1px solid var(--line);
+        }
+        button.ghost:hover { background: var(--paper); color: var(--ink); }
+
+        .form-group { display: flex; flex-direction: column; }
+        .form-login input#contaNome { display: none; }
+
+        .troca-modo {
+            margin: 14px 0 0;
+            font-size: 0.88rem;
+            color: var(--ink-soft);
+        }
+
+        .cadastro-grid {
+            display: grid;
+            grid-template-columns: 1.6fr 1fr 0.8fr auto;
+            gap: 10px;
+            align-items: end;
+        }
+
+        @media (max-width: 620px) {
+            .cadastro-grid { grid-template-columns: 1fr; }
+        }
+
+        .list-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 18px;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .list-head h2 { margin: 0; }
+        .list-head select { width: 220px; }
+
+        .restaurants-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 14px;
+        }
+
+        .restaurant-card {
+            background: var(--paper);
+            border: 1px solid var(--line);
+            border-left: 4px solid var(--tomato);
+            border-radius: 10px;
+            padding: 16px;
+        }
+
+        .restaurant-card h3 {
+            margin: 0 0 8px;
+            font-family: 'Fraunces', serif;
+            font-weight: 600;
+            font-size: 1.05rem;
+        }
+
+        .badge {
+            display: inline-block;
+            background: rgba(92, 122, 82, 0.14);
+            color: var(--sage);
+            padding: 3px 10px;
+            border-radius: 999px;
+            font-size: 0.76rem;
+            font-weight: 600;
+        }
+
+        .rating {
+            display: block;
+            margin-top: 8px;
+            color: var(--mustard);
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .empty-note {
+            color: var(--ink-soft);
+            padding: 12px 0;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header class="hero">
+            <div>
+                <p class="mark">Easy<span>Food</span></p>
+                <p class="tagline">Cadastre, organize e encontre seus estabelecimentos favoritos em um só lugar.</p>
+            </div>
+
+            <div class="session-pill">
+                <span id="statusLogin">Você não está logado.</span>
+                <button type="button" id="btnSair" class="ghost" style="display: none;">Sair</button>
+            </div>
+        </header>
+
+        <div class="layout">
+            <div class="sidebar">
+                <div class="panel" id="blocoAcesso">
+                    <h2 id="tituloConta">Entrar</h2>
+
+                    <form id="formConta" class="form-group form-login">
+                        <div class="field">
+                            <label for="contaNome">Nome</label>
+                            <input type="text" id="contaNome" placeholder="Seu nome" autocomplete="name" hidden>
+                        </div>
+                        <div class="field">
+                            <label for="contaEmail">E-mail</label>
+                            <input type="email" id="contaEmail" placeholder="voce@email.com" autocomplete="email" required>
+                        </div>
+                        <div class="field">
+                            <label for="contaSenha">Senha</label>
+                            <input type="password" id="contaSenha" placeholder="••••••••" autocomplete="current-password" required>
+                        </div>
+                        <button type="submit" id="btnConta">Entrar</button>
+                    </form>
+
+                    <p class="troca-modo">
+                        <span id="textoTroca">Ainda não tem conta?</span>
+                        <button type="button" id="btnTroca" class="link-btn">Criar conta</button>
+                    </p>
+                </div>
+
+                <div class="panel">
+                    <h2>Novo estabelecimento</h2>
+                    <form id="formCadastro" class="form-group">
+                        <div class="field">
+                            <label for="name">Nome</label>
+                            <input type="text" id="name" placeholder="Ex: Sabor & Arte" required>
+                        </div>
+                        <div class="field">
+                            <label for="category">Categoria</label>
+                            <input type="text" id="category" placeholder="Ex: Pizza, Japonesa..." required>
+                        </div>
+                        <div class="field">
+                            <label for="rating">Nota (0 a 5)</label>
+                            <input type="number" id="rating" step="0.1" min="0" max="5" placeholder="4.5" required>
+                        </div>
+                        <button type="submit">Cadastrar restaurante</button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="panel">
+                <div class="list-head">
+                    <h2>Restaurantes cadastrados</h2>
+                    <select id="filtroCategory" onchange="filtrarRestaurantes()">
+                        <option value="">Todas as categorias</option>
+                    </select>
+                </div>
+                <div id="listaRestaurantes" class="restaurants-grid">
+                    <!-- Os cards entram via JavaScript -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:3000/restaurants';
+        const AUTH_URL = 'http://localhost:3000/auth';
+        let todosRestaurantes = [];
+        let modoConta = 'login'; // 'login' ou 'registro'
+
+        // ===== Autenticação =====
+        function atualizarStatusLogin() {
+            const nome = localStorage.getItem('userName');
+            const logado = !!localStorage.getItem('token');
+
+            document.getElementById('statusLogin').textContent =
+                logado ? `Logado como ${nome}` : 'Você não está logado.';
+            document.getElementById('btnSair').style.display =
+                logado ? 'inline-block' : 'none';
+
+            // Logado: esconde o formulário de entrar / criar conta
+            document.getElementById('blocoAcesso').style.display =
+                logado ? 'none' : 'block';
+            document.getElementById('tituloConta').style.display =
+                logado ? 'none' : 'block';
+        }
+
+        function limparSessao() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('userName');
+            atualizarStatusLogin();
+        }
+
+        // Alterna o formulário entre "Entrar" e "Criar conta"
+        function definirModoConta(modo) {
+            modoConta = modo;
+            const registro = modo === 'registro';
+            const form = document.getElementById('formConta');
+
+            form.classList.toggle('form-login', !registro);
+            form.classList.toggle('form-registro', registro);
+
+            document.getElementById('contaNome').hidden = !registro;
+            document.getElementById('contaNome').required = registro;
+            document.getElementById('contaSenha').autocomplete =
+                registro ? 'new-password' : 'current-password';
+
+            document.getElementById('tituloConta').textContent = registro ? 'Criar conta' : 'Entrar';
+            document.getElementById('btnConta').textContent = registro ? 'Criar conta' : 'Entrar';
+            document.getElementById('textoTroca').textContent =
+                registro ? 'Já tem conta?' : 'Ainda não tem conta?';
+            document.getElementById('btnTroca').textContent = registro ? 'Entrar' : 'Criar conta';
+        }
+
+        document.getElementById('btnTroca').addEventListener('click', () => {
+            definirModoConta(modoConta === 'login' ? 'registro' : 'login');
+        });
+
+        // Faz o login e guarda o token; devolve true se deu certo
+        async function fazerLogin(email, password) {
+            const response = await fetch(`${AUTH_URL}/login`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password })
+            });
+
+            if (!response.ok) {
+                alert('E-mail ou senha inválidos.');
+                return false;
+            }
+
+            const data = await response.json();
+            localStorage.setItem('token', data.token);
+            localStorage.setItem('userName', data.user.name);
+            return true;
+        }
+
+        document.getElementById('formConta').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const name = document.getElementById('contaNome').value.trim();
+            const email = document.getElementById('contaEmail').value.trim();
+            const password = document.getElementById('contaSenha').value;
+
+            try {
+                if (modoConta === 'registro') {
+                    const cadastro = await fetch(`${AUTH_URL}/register`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ name, email, password })
+                    });
+
+                    if (cadastro.status === 409) {
+                        alert('Este e-mail já está cadastrado. Entre com ele ou use outro e-mail.');
+                        return;
+                    }
+                    if (!cadastro.ok) {
+                        alert('Não foi possível criar a conta. Confira nome, e-mail e senha.');
+                        return;
+                    }
+                }
+
+                // Depois de criar a conta, entra automaticamente
+                const entrou = await fazerLogin(email, password);
+                if (!entrou) return;
+
+                document.getElementById('formConta').reset();
+                definirModoConta('login');
+                atualizarStatusLogin();
+            } catch (error) {
+                console.error('Erro na autenticação:', error);
+                alert('Erro ao conectar com o servidor da API.');
+            }
+        });
+
+        document.getElementById('btnSair').addEventListener('click', limparSessao);
+
+        // 1. Buscar restaurantes ao carregar a página
+        async function carregarRestaurantes() {
+            try {
+                const response = await fetch(API_URL);
+                todosRestaurantes = await response.json();
+                exibirRestaurantes(todosRestaurantes);
+                atualizarFiltros(todosRestaurantes);
+            } catch (error) {
+                console.error("Erro ao carregar dados:", error);
+                alert("Erro ao conectar com o servidor da API.");
+            }
+        }
+
+        // 2. Renderizar os cards na tela
+        function exibirRestaurantes(lista) {
+            const container = document.getElementById('listaRestaurantes');
+            container.innerHTML = '';
+
+            if (lista.length === 0) {
+                container.innerHTML = '<p style="color: var(--gray);">Nenhum restaurante encontrado.</p>';
+                return;
+            }
+
+            lista.forEach(rest => {
+                const card = document.createElement('div');
+                card.className = 'restaurant-card';
+                card.innerHTML = `
+                    <h3>${rest.name}</h3>
+                    <p><span class="badge">${rest.category}</span></p>
+                    <p>Avaliação: <span class="rating">⭐ ${rest.rating}</span></p>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        // 3. Popular o select de categorias dinamicamente
+        function atualizarFiltros(lista) {
+            const select = document.getElementById('filtroCategory');
+            const categoriasUnicas = [...new Set(lista.map(r => r.category))];
+            
+            // Mantém a primeira opção e limpa o resto
+            select.innerHTML = '<option value="">Todas as categorias</option>';
+            
+            categoriasUnicas.forEach(cat => {
+                const option = document.createElement('option');
+                option.value = cat;
+                option.textContent = cat;
+                select.appendChild(option);
+            });
+        }
+
+        // 4. Filtrar por categoria selecionada
+        function filtrarRestaurantes() {
+            const categoriaSelecionada = document.getElementById('filtroCategory').value;
+            if (!categoriaSelecionada) {
+                exibirRestaurantes(todosRestaurantes);
+            } else {
+                const filtrados = todosRestaurantes.filter(r => r.category === categoriaSelecionada);
+                exibirRestaurantes(filtrados);
+            }
+        }
+
+        // 5. Enviar novo cadastro via POST
+        document.getElementById('formCadastro').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const novoRestaurante = {
+                name: document.getElementById('name').value,
+                category: document.getElementById('category').value,
+                rating: parseFloat(document.getElementById('rating').value)
+            };
+
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    },
+                    body: JSON.stringify(novoRestaurante)
+                });
+
+                if (response.ok) {
+                    document.getElementById('formCadastro').reset();
+                    carregarRestaurantes(); // Recarrega a lista do banco
+                } else if (response.status === 401) {
+                    limparSessao(); // token ausente, inválido ou expirado
+                    alert("Faça login para cadastrar restaurantes.");
+                } else {
+                    alert("Erro ao cadastrar restaurante.");
+                }
+            } catch (error) {
+                console.error("Erro na requisição POST:", error);
+            }
+        });
+
+        // Executa ao abrir
+        atualizarStatusLogin();
+        carregarRestaurantes();
+    </script>
+</body>
+</html>
