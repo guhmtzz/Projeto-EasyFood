@@ -1,0 +1,1583 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>EasyFood - Gestão de Restaurantes</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --paper: #FBF6EE;
+            --ink: #2A2118;
+            --ink-soft: #6B5D4F;
+            --tomato: #E4572E;
+            --tomato-deep: #C8431E;
+            --sage: #5C7A52;
+            --mustard: #E3A63E;
+            --line: #E3D9C6;
+            --card: #FFFFFF;
+            --radius: 14px;
+            font-family: 'Work Sans', sans-serif;
+        }
+
+        * { box-sizing: border-box; }
+        [hidden] { display: none !important; }
+
+        body {
+            background: var(--paper);
+            color: var(--ink);
+            margin: 0;
+            padding: 0 20px 60px;
+            padding-top: env(safe-area-inset-top, 0px);
+            line-height: 1.5;
+        }
+
+        .container { max-width: 1040px; margin: 0 auto; }
+
+        header.hero {
+            padding: 48px 0 32px;
+            border-bottom: 1px solid var(--line);
+            margin-bottom: 32px;
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            gap: 24px;
+            flex-wrap: wrap;
+        }
+
+        header.hero .mark {
+            font-family: 'Fraunces', serif;
+            font-weight: 600;
+            font-size: 2.6rem;
+            color: var(--ink);
+            margin: 0;
+            letter-spacing: -0.01em;
+        }
+
+        header.hero .mark span { color: var(--tomato); }
+
+        header.hero p.tagline {
+            margin: 6px 0 0;
+            color: var(--ink-soft);
+            font-size: 1.02rem;
+            max-width: 34ch;
+        }
+
+        .session-pill {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: var(--card);
+            border: 1px solid var(--line);
+            border-radius: 999px;
+            padding: 8px 8px 8px 18px;
+            font-size: 0.9rem;
+            color: var(--ink-soft);
+        }
+
+        .session-pill button { border-radius: 999px; padding: 8px 16px; }
+
+        .layout {
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            gap: 28px;
+            align-items: start;
+        }
+
+        @media (max-width: 860px) {
+            .layout { grid-template-columns: 1fr; }
+        }
+
+        .panel {
+            background: var(--card);
+            border: 1px solid var(--line);
+            border-radius: var(--radius);
+            padding: 22px;
+        }
+
+        .panel + .panel { margin-top: 20px; }
+
+        .panel h2 {
+            font-family: 'Fraunces', serif;
+            font-weight: 600;
+            font-size: 1.15rem;
+            margin: 0 0 16px;
+            color: var(--ink);
+        }
+
+        .panel h3.sub {
+            font-family: 'Fraunces', serif;
+            font-weight: 600;
+            font-size: 1rem;
+            margin: 20px 0 10px;
+        }
+
+        .hint { color: var(--ink-soft); font-size: 0.88rem; margin: 0 0 14px; }
+
+        .field { margin-bottom: 12px; }
+        .field label {
+            display: block;
+            font-size: 0.82rem;
+            color: var(--ink-soft);
+            margin-bottom: 5px;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-family: inherit;
+            background: var(--paper);
+            color: var(--ink);
+            outline: none;
+        }
+
+        textarea { resize: vertical; min-height: 76px; }
+
+        input:focus, select:focus, textarea:focus, button:focus-visible {
+            border-color: var(--tomato);
+            box-shadow: 0 0 0 3px rgba(228, 87, 46, 0.15);
+        }
+
+        input[type="checkbox"] { width: auto; margin-right: 8px; accent-color: var(--tomato); }
+        label.check { display: flex; align-items: center; font-size: 0.9rem; color: var(--ink); margin: 4px 0 14px; cursor: pointer; }
+
+        button {
+            background: var(--tomato);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 16px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            transition: background 0.15s ease;
+        }
+
+        button:hover { background: var(--tomato-deep); }
+        button:disabled { opacity: 0.6; cursor: wait; }
+
+        button.link-btn {
+            background: none;
+            color: var(--tomato-deep);
+            padding: 0;
+            font-weight: 500;
+            text-decoration: underline;
+            text-underline-offset: 3px;
+        }
+        button.link-btn:hover { background: none; color: var(--tomato); }
+
+        button.ghost {
+            background: transparent;
+            color: var(--ink-soft);
+            border: 1px solid var(--line);
+        }
+        button.ghost:hover { background: var(--paper); color: var(--ink); }
+
+        button.danger { background: transparent; color: var(--tomato-deep); border: 1px solid var(--tomato); }
+        button.danger:hover { background: var(--tomato); color: #fff; }
+
+        button.small { padding: 6px 12px; font-size: 0.82rem; }
+
+        .form-group { display: flex; flex-direction: column; }
+
+        .troca-modo { margin: 14px 0 0; font-size: 0.88rem; color: var(--ink-soft); }
+
+        .row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .row-botoes { display: flex; gap: 10px; flex-wrap: wrap; }
+
+        /* ===== Conta ===== */
+        .perfil { display: flex; align-items: center; gap: 14px; margin-bottom: 8px; }
+        .perfil h2 { margin: 0; font-size: 1.05rem; }
+        .perfil p { margin: 0; font-size: 0.85rem; color: var(--ink-soft); word-break: break-all; }
+
+        .avatar { position: relative; flex: none; }
+        .avatar-moldura {
+            width: 64px; height: 64px; border-radius: 50%;
+            background: var(--paper); border: 1px solid var(--line);
+            display: flex; align-items: center; justify-content: center;
+            font-family: 'Fraunces', serif; font-weight: 600; font-size: 1.3rem; color: var(--tomato-deep);
+            overflow: hidden;
+        }
+        .avatar-moldura img { width: 100%; height: 100%; object-fit: cover; }
+
+        .btn-foto {
+            position: absolute; right: -4px; bottom: -4px;
+            width: 28px; height: 28px; padding: 0; border-radius: 50%;
+            font-size: 0.8rem; line-height: 1; border: 2px solid var(--card);
+        }
+
+        .tag-papel {
+            display: inline-block; margin-top: 4px;
+            background: rgba(227, 166, 62, 0.18); color: #8a5d0c;
+            padding: 2px 10px; border-radius: 999px; font-size: 0.72rem; font-weight: 600;
+        }
+
+        .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 14px; }
+        .stat { background: var(--paper); border: 1px solid var(--line); border-radius: 10px; padding: 10px 6px; text-align: center; }
+        .stat strong { display: block; font-family: 'Fraunces', serif; font-size: 1.25rem; }
+        .stat span { font-size: 0.7rem; color: var(--ink-soft); }
+        .stats.quatro { grid-template-columns: repeat(2, 1fr); }
+
+        .lista-simples { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+        .lista-simples button.linha {
+            width: 100%; display: flex; justify-content: space-between; align-items: center; gap: 8px;
+            background: var(--paper); color: var(--ink); border: 1px solid var(--line);
+            padding: 9px 12px; text-align: left; font-weight: 500; font-size: 0.9rem;
+        }
+        .lista-simples button.linha:hover { border-color: var(--tomato); background: #fff; }
+        .lista-simples small { color: var(--ink-soft); font-weight: 400; }
+        .lista-simples .linha-info { padding: 8px 12px; background: var(--paper); border: 1px solid var(--line); border-radius: 8px; font-size: 0.85rem; }
+
+        /* ===== Lista ===== */
+        .list-head {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 14px; gap: 16px; flex-wrap: wrap;
+        }
+        .list-head h2 { margin: 0; }
+        .list-head .contagem { color: var(--ink-soft); font-family: 'Work Sans', sans-serif; font-weight: 400; font-size: 0.85rem; margin-left: 6px; }
+
+        .controles { display: grid; grid-template-columns: 1fr 1fr auto; gap: 10px; margin-bottom: 18px; align-items: center; }
+        .controles input { grid-column: 1 / -1; }
+        @media (max-width: 520px) { .controles { grid-template-columns: 1fr 1fr; } .controles button { grid-column: 1 / -1; } }
+        button.fav-toggle { background: var(--paper); color: var(--ink-soft); border: 1px solid var(--line); }
+        button.fav-toggle:hover { background: #fff; color: var(--tomato-deep); }
+        button.fav-toggle.ativo { background: rgba(228, 87, 46, 0.12); color: var(--tomato-deep); border-color: var(--tomato); }
+
+        .restaurants-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 14px;
+        }
+
+        .restaurant-card {
+            position: relative;
+            background: var(--paper);
+            border: 1px solid var(--line);
+            border-left: 4px solid var(--tomato);
+            border-radius: 10px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+        }
+        .restaurant-card:hover, .restaurant-card:focus-visible { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(42, 33, 24, 0.1); outline: none; }
+
+        .card-capa { aspect-ratio: 16 / 9; background: var(--line); }
+        .card-capa img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .card-corpo { padding: 14px 16px 16px; }
+
+        .restaurant-card h3 {
+            margin: 0 0 8px;
+            font-family: 'Fraunces', serif;
+            font-weight: 600;
+            font-size: 1.05rem;
+            padding-right: 30px;
+        }
+
+        .badge {
+            display: inline-block;
+            background: rgba(92, 122, 82, 0.14);
+            color: var(--sage);
+            padding: 3px 10px;
+            border-radius: 999px;
+            font-size: 0.76rem;
+            font-weight: 600;
+        }
+        .badge.dono { background: rgba(228, 87, 46, 0.12); color: var(--tomato-deep); }
+        .badge.inativo { background: rgba(107, 93, 79, 0.15); color: var(--ink-soft); }
+        .badge.novo { background: rgba(227, 166, 62, 0.2); color: #8a5d0c; }
+
+        .rating { display: block; margin-top: 8px; color: var(--mustard); font-weight: 600; font-size: 0.9rem; }
+        .rating small { color: var(--ink-soft); font-weight: 400; }
+        .rating-inline { color: var(--mustard); font-weight: 600; font-size: 0.95rem; }
+        .rating-inline small { color: var(--ink-soft); font-weight: 400; }
+
+        .coracao {
+            position: absolute; top: 8px; right: 8px;
+            width: 34px; height: 34px; padding: 0; border-radius: 50%;
+            background: rgba(255, 255, 255, 0.92); color: #b9ab99; font-size: 1.05rem; line-height: 1;
+        }
+        .coracao:hover { background: #fff; color: var(--tomato); }
+        .coracao.on { color: var(--tomato); }
+
+        .empty-note { color: var(--ink-soft); padding: 12px 0; grid-column: 1 / -1; }
+        .vazio { grid-column: 1 / -1; text-align: center; color: var(--ink-soft); padding: 28px 12px; border: 1px dashed var(--line); border-radius: 10px; }
+        .vazio strong { display: block; color: var(--ink); margin-bottom: 4px; }
+
+        .carregar-mais { grid-column: 1 / -1; justify-self: center; }
+
+        /* ===== Detalhe ===== */
+        .voltar { margin-bottom: 14px; display: inline-block; }
+
+        .capa { position: relative; aspect-ratio: 16 / 6; border-radius: 12px; overflow: hidden; background: var(--line); margin-bottom: 16px; }
+        .capa img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .capa-acoes { position: absolute; right: 10px; bottom: 10px; display: flex; gap: 8px; }
+        .mini-btn { width: 38px; height: 38px; padding: 0; border-radius: 50%; font-size: 1rem; line-height: 1; border: 2px solid #fff; }
+        .mini-btn.perigo { background: #5d4a3a; }
+        .mini-btn.perigo:hover { background: #3a2c20; }
+
+        .det-cabecalho h2 { font-family: 'Fraunces', serif; font-size: 1.7rem; margin: 0 0 8px; }
+        .det-cabecalho p { margin: 6px 0; }
+        .det-cabecalho .descricao { color: var(--ink); }
+        .det-cabecalho .contato { color: var(--ink-soft); font-size: 0.9rem; }
+        .det-cabecalho .linha-meta { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+
+        .bloco { margin-top: 22px; }
+        .bloco-titulo { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 12px; }
+        .bloco-titulo h3 { font-family: 'Fraunces', serif; font-size: 1.15rem; margin: 0; }
+        .bloco-titulo .contagem { color: var(--ink-soft); font-size: 0.85rem; }
+
+        .avaliacao { display: flex; justify-content: space-between; align-items: center; gap: 14px; flex-wrap: wrap; background: var(--paper); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; }
+        .avaliacao h4 { margin: 0 0 2px; font-family: 'Fraunces', serif; font-size: 1rem; }
+        .avaliacao p { margin: 0; color: var(--ink-soft); font-size: 0.85rem; }
+        .estrelas { display: flex; gap: 2px; }
+        .estrela { background: none; color: #d8ccb8; font-size: 1.7rem; line-height: 1; padding: 2px 4px; }
+        .estrela:hover { background: none; color: var(--mustard); }
+        .estrela.on { color: var(--mustard); }
+
+        .form-painel { background: var(--paper); border: 1px solid var(--line); border-radius: 12px; padding: 18px; margin-top: 12px; }
+        .form-painel h4 { margin: 0 0 12px; font-family: 'Fraunces', serif; font-size: 1.05rem; }
+
+        .pratos-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 14px; }
+        .dish-card { background: #fff; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; display: flex; flex-direction: column; }
+        .dish-card.indisponivel { opacity: 0.7; }
+        .dish-foto { position: relative; aspect-ratio: 4 / 3; background: var(--line); }
+        .dish-foto img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .dish-foto .acoes { position: absolute; right: 8px; bottom: 8px; display: flex; gap: 6px; }
+        .dish-foto .mini-btn { width: 32px; height: 32px; font-size: 0.85rem; }
+        .dish-info { padding: 12px 14px 14px; display: flex; flex-direction: column; gap: 6px; flex: 1; }
+        .dish-info h4 { margin: 0; font-family: 'Fraunces', serif; font-size: 1rem; }
+        .dish-info p { margin: 0; font-size: 0.85rem; color: var(--ink-soft); flex: 1; }
+        .dish-baixo { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 4px; }
+        .preco { font-weight: 700; color: var(--tomato-deep); }
+        .dish-acoes { display: flex; gap: 6px; }
+
+        /* ===== Toast e carregamento ===== */
+        .toast {
+            position: fixed; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+            transform: translate(-50%, 20px); opacity: 0; pointer-events: none;
+            background: var(--ink); color: #fff; padding: 12px 20px; border-radius: 999px;
+            font-size: 0.92rem; max-width: min(92vw, 460px); text-align: center;
+            transition: opacity 0.2s ease, transform 0.2s ease; z-index: 50;
+        }
+        .toast.show { opacity: 1; transform: translate(-50%, 0); }
+        .toast.erro { background: var(--tomato-deep); }
+        .toast.ok { background: var(--sage); }
+
+        .carregando { opacity: 0.5; pointer-events: none; }
+        .esqueleto { height: 190px; border-radius: 10px; background: linear-gradient(90deg, #f1e9da 25%, #f8f2e7 50%, #f1e9da 75%); background-size: 200% 100%; animation: brilho 1.2s infinite; }
+        @keyframes brilho { to { background-position: -200% 0; } }
+
+        .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header class="hero">
+            <div>
+                <p class="mark">Easy<span>Food</span></p>
+                <p class="tagline">Cadastre, organize e encontre seus estabelecimentos favoritos em um só lugar.</p>
+            </div>
+
+            <div class="session-pill">
+                <span id="statusLogin">Você não está logado.</span>
+                <button type="button" id="btnSair" class="ghost" style="display: none;">Sair</button>
+            </div>
+        </header>
+
+        <div class="layout">
+            <div class="sidebar">
+                <!-- Entrar / Criar conta (visitante) -->
+                <div class="panel" id="blocoAcesso">
+                    <h2 id="tituloConta">Entrar</h2>
+
+                    <form id="formConta" class="form-group form-login">
+                        <div class="field" id="campoNome" hidden>
+                            <label for="contaNome">Nome</label>
+                            <input type="text" id="contaNome" placeholder="Seu nome" autocomplete="name" maxlength="150">
+                        </div>
+                        <div class="field">
+                            <label for="contaEmail">E-mail</label>
+                            <input type="email" id="contaEmail" placeholder="voce@email.com" autocomplete="email" required>
+                        </div>
+                        <div class="field">
+                            <label for="contaSenha">Senha</label>
+                            <input type="password" id="contaSenha" placeholder="••••••••" autocomplete="current-password" maxlength="72" required>
+                        </div>
+                        <button type="submit" id="btnConta">Entrar</button>
+                    </form>
+
+                    <p class="troca-modo">
+                        <span id="textoTroca">Ainda não tem conta?</span>
+                        <button type="button" id="btnTroca" class="link-btn">Criar conta</button>
+                    </p>
+                </div>
+
+                <!-- Conta (logado) -->
+                <div class="panel" id="blocoConta" hidden></div>
+
+                <!-- Novo estabelecimento -->
+                <div class="panel" id="blocoNovo">
+                    <h2>Novo estabelecimento</h2>
+                    <p class="hint" id="avisoNovo">Entre na sua conta para cadastrar restaurantes. Você vira o dono e monta o cardápio.</p>
+                    <form id="formCadastro" class="form-group" hidden>
+                        <div class="field">
+                            <label for="name">Nome</label>
+                            <input type="text" id="name" placeholder="Ex: Sabor & Arte" maxlength="150" required>
+                        </div>
+                        <div class="field">
+                            <label for="category">Categoria</label>
+                            <input type="text" id="category" list="listaCategorias" placeholder="Ex: Pizza, Japonesa..." maxlength="100" required>
+                        </div>
+                        <p class="hint">A nota vem das avaliações dos clientes. O restaurante começa como <strong>Novo</strong>.</p>
+                        <button type="submit" id="btnCadastrar">Cadastrar restaurante</button>
+                    </form>
+                    <datalist id="listaCategorias"></datalist>
+                </div>
+            </div>
+
+            <div class="panel" id="areaPrincipal">
+                <!-- Lista -->
+                <div id="telaLista">
+                    <div class="list-head">
+                        <h2>Restaurantes cadastrados <span class="contagem" id="contagem"></span></h2>
+                    </div>
+
+                    <div class="controles">
+                        <input type="search" id="busca" placeholder="Buscar por nome ou categoria" autocomplete="off" aria-label="Buscar restaurantes">
+                        <select id="filtroCategory" aria-label="Filtrar por categoria">
+                            <option value="">Todas as categorias</option>
+                        </select>
+                        <select id="ordem" aria-label="Ordenar">
+                            <option value="padrao">Ordem de cadastro</option>
+                            <option value="nota">Melhor avaliados</option>
+                            <option value="nome">Nome (A–Z)</option>
+                            <option value="recentes">Mais recentes</option>
+                        </select>
+                        <button type="button" id="btnFavoritos" class="fav-toggle" aria-pressed="false">♥ Favoritos</button>
+                    </div>
+
+                    <div id="listaRestaurantes" class="restaurants-grid">
+                        <!-- Os cards entram via JavaScript -->
+                    </div>
+                </div>
+
+                <!-- Detalhe + cardápio -->
+                <div id="telaDetalhe" hidden>
+                    <div id="detTopo"></div>
+                    <div id="detAvaliacao" class="bloco"></div>
+                    <div id="detGerenciar"></div>
+                    <div id="detCardapio" class="bloco"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    <input type="file" id="arquivo" class="sr-only" accept="image/jpeg,image/png,image/webp" tabindex="-1">
+
+    <script>
+        // Servido pelo Express usa a mesma origem; aberto direto do disco aponta para a API local
+        const API = location.protocol === 'file:' ? 'http://localhost:3000' : '';
+        const POR_PAGINA = 6;
+        const MAX_IMAGEM_MB = 5;
+        const TIPOS_IMAGEM = ['image/jpeg', 'image/png', 'image/webp'];
+
+        // localStorage pode estar bloqueado (aba anônima, por exemplo); o app funciona sem ele
+        const armazenamento = {
+            get(chave) { try { return localStorage.getItem(chave); } catch { return null; } },
+            set(chave, valor) { try { localStorage.setItem(chave, valor); } catch { /* ignora */ } },
+            remove(chave) { try { localStorage.removeItem(chave); } catch { /* ignora */ } }
+        };
+
+        const estado = {
+            restaurantes: [],
+            meus: [],
+            painel: null,          // números do dono
+            admin: null,           // visão geral (só ADMIN)
+            token: armazenamento.get('token'),
+            usuario: lerJson(armazenamento.get('usuario')),
+            favoritos: new Set(),
+            categoria: '',
+            busca: '',
+            ordem: 'padrao',
+            soFavoritos: false,
+            pagina: 1,
+            modoConta: 'login',    // 'login' ou 'registro'
+            atual: null,           // restaurante aberto no detalhe
+            pratos: null,
+            minhaNota: null,
+            editandoPrato: null,
+            formPrato: false,
+            formRestaurante: false,
+            envio: null            // alvo do upload de imagem em andamento
+        };
+
+        function lerJson(texto) {
+            try { return JSON.parse(texto || 'null'); } catch { return null; }
+        }
+
+        // ===== Utilitários =====
+        const $ = (id) => document.getElementById(id);
+
+        function esc(valor) {
+            return String(valor ?? '').replace(/[&<>"']/g, (c) => ({
+                '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+            }[c]));
+        }
+
+        function normalizar(texto) {
+            return String(texto || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+        }
+
+        function iniciais(nome) {
+            return String(nome || '?').trim().split(/\s+/).slice(0, 2).map((p) => p[0]).join('').toUpperCase();
+        }
+
+        function dinheiro(valor) {
+            return Number(valor).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+        }
+
+        function srcImagem(caminho) { return caminho ? API + caminho : ''; }
+
+        let temporizadorToast;
+        function aviso(mensagem, tipo = '') {
+            const el = $('toast');
+            el.textContent = mensagem;
+            el.className = `toast ${tipo} show`;
+            clearTimeout(temporizadorToast);
+            temporizadorToast = setTimeout(() => { el.className = `toast ${tipo}`; }, 3400);
+        }
+
+        // ===== Imagens geradas quando não há foto: degradê da categoria + emoji =====
+        const ESTILO_CATEGORIA = {
+            Burger: ['🍔', '#fbe7c2', '#f3c574'],
+            Pizza: ['🍕', '#fde3cf', '#f6b98d'],
+            Sushi: ['🍣', '#fde2e2', '#f2b2b2'],
+            'Saudável': ['🥗', '#e1f0e4', '#b5d9bf'],
+            Mexicana: ['🌮', '#fbe4cc', '#efab72'],
+            Brasileira: ['🍛', '#ebf0da', '#c9d7a2'],
+            Japonesa: ['🍱', '#f3e1ef', '#d9b1cf'],
+            Italiana: ['🍝', '#fde9dd', '#f1bc9b']
+        };
+        const ESTILO_PADRAO = [['🍽️', '#efe7dd', '#dccbb8'], ['🥘', '#e7ecf3', '#bccbe0'], ['🍜', '#f4e8da', '#e2c49c']];
+
+        function estiloCategoria(categoria) {
+            if (ESTILO_CATEGORIA[categoria]) return ESTILO_CATEGORIA[categoria];
+            const soma = [...String(categoria || '')].reduce((total, c) => total + c.charCodeAt(0), 0);
+            return ESTILO_PADRAO[soma % ESTILO_PADRAO.length];
+        }
+
+        const EMOJI_PRATO = [
+            [/sobremesa|doce|torta|bolo|tiramis|pudim|mousse|brownie/, '🍰'],
+            [/sorvete|acai|gelato/, '🍨'],
+            [/bebida|suco|refri|drink|soda|agua|cerveja|chopp/, '🥤'],
+            [/cafe|cappuccino|espresso/, '☕'],
+            [/pizza|margherita|calabresa/, '🍕'],
+            [/massa|lasanha|espaguete|nhoque|macarr|talharim|ravioli/, '🍝'],
+            [/hamb|burger|lanche|sanduich/, '🍔'],
+            [/sushi|sashimi|temaki|combo/, '🍣'],
+            [/lamen|ramen|yakisoba|udon/, '🍜'],
+            [/salada|saudavel|vegan|bowl/, '🥗'],
+            [/frango|galinha/, '🍗'],
+            [/carne|bife|picanha|churrasco|costela/, '🥩'],
+            [/batata|frita|porcao|petisco|entrada/, '🍟'],
+            [/taco|burrito|nacho/, '🌮']
+        ];
+
+        function emojiPrato(prato, categoriaRestaurante) {
+            const texto = normalizar(`${prato.category} ${prato.name}`);
+            const achou = EMOJI_PRATO.find(([padrao]) => padrao.test(texto));
+            return achou ? achou[1] : estiloCategoria(categoriaRestaurante)[0];
+        }
+
+        const cacheArte = new Map();
+        function arte(emoji, categoria, semente) {
+            const chave = `${emoji}|${categoria}|${semente}`;
+            if (cacheArte.has(chave)) return cacheArte.get(chave);
+
+            const [, de, ate] = estiloCategoria(categoria);
+            const aleatorio = (n) => {
+                const x = Math.sin(semente * 9301 + n * 49297) * 233280;
+                return x - Math.floor(x);
+            };
+            const circulos = [0, 1, 2, 3].map((i) =>
+                `<circle cx="${Math.round(aleatorio(i) * 400)}" cy="${Math.round(aleatorio(i + 7) * 300)}" r="${Math.round(40 + aleatorio(i + 13) * 90)}" fill="#fff" opacity="${(0.12 + aleatorio(i + 21) * 0.18).toFixed(2)}"/>`
+            ).join('');
+
+            const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice">
+                <defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${de}"/><stop offset="1" stop-color="${ate}"/></linearGradient></defs>
+                <rect width="400" height="300" fill="url(#g)"/>${circulos}
+                <text x="200" y="160" font-size="118" text-anchor="middle" dominant-baseline="middle">${emoji}</text>
+            </svg>`;
+
+            const uri = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
+            cacheArte.set(chave, uri);
+            return uri;
+        }
+
+        function imagemRestaurante(r) {
+            return r.imageUrl ? srcImagem(r.imageUrl) : arte(estiloCategoria(r.category)[0], r.category, r.id);
+        }
+
+        function imagemPrato(prato, restaurante) {
+            return prato.imageUrl
+                ? srcImagem(prato.imageUrl)
+                : arte(emojiPrato(prato, restaurante.category), restaurante.category, prato.id + 7919);
+        }
+
+        // A nota só aparece quando existe avaliação de cliente; antes disso o restaurante é "Novo"
+        function textoAvaliacoes(qtd) {
+            if (!qtd) return 'sem avaliações';
+            return `${qtd} ${qtd === 1 ? 'avaliação' : 'avaliações'}`;
+        }
+
+        function notaCard(r) {
+            if (!r.reviewsCount) return '<span class="rating"><span class="badge novo">Novo</span></span>';
+            return `<span class="rating">⭐ ${Number(r.rating).toFixed(1)} <small>· ${textoAvaliacoes(r.reviewsCount)}</small></span>`;
+        }
+
+        function notaInline(r) {
+            if (!r.reviewsCount) return '<span class="badge novo">Novo</span>';
+            return `<span class="rating-inline">⭐ ${Number(r.rating).toFixed(1)} <small>· ${textoAvaliacoes(r.reviewsCount)}</small></span>`;
+        }
+
+        const PAPEIS = { CUSTOMER: 'Cliente', OWNER: 'Proprietário', ADMIN: 'Administrador' };
+
+        // ===== API =====
+        async function api(caminho, { method = 'GET', body, form } = {}) {
+            const headers = {};
+            if (body) headers['Content-Type'] = 'application/json';
+            if (estado.token) headers.Authorization = `Bearer ${estado.token}`;
+
+            let resposta;
+            try {
+                resposta = await fetch(API + caminho, {
+                    method,
+                    headers,
+                    body: form || (body ? JSON.stringify(body) : undefined)
+                });
+            } catch {
+                throw new Error('Erro ao conectar com o servidor da API. Ele está rodando? (npm start)');
+            }
+
+            const dados = resposta.status === 204 ? null : await resposta.json().catch(() => null);
+
+            if (!resposta.ok) {
+                // token ausente, inválido ou expirado (ou conta apagada): encerra a sessão
+                if (resposta.status === 401 && estado.token) {
+                    sairDaConta(false);
+                    const encerrada = new Error((dados && dados.error) || 'Sua sessão expirou. Entre novamente.');
+                    encerrada.status = 401;
+                    throw encerrada;
+                }
+                const erro = new Error((dados && dados.error) || 'Algo deu errado');
+                erro.status = resposta.status;
+                throw erro;
+            }
+
+            return dados;
+        }
+
+        // ===== Sessão =====
+        function favoritosChave() {
+            return `favoritos.${estado.usuario ? estado.usuario.id : 'visitante'}`;
+        }
+
+        function carregarFavoritos() {
+            estado.favoritos = new Set(lerJson(armazenamento.get(favoritosChave())) || []);
+        }
+
+        function salvarSessao() {
+            if (estado.token) {
+                armazenamento.set('token', estado.token);
+                armazenamento.set('usuario', JSON.stringify(estado.usuario));
+            } else {
+                armazenamento.remove('token');
+                armazenamento.remove('usuario');
+                armazenamento.remove('userName'); // chave da versão anterior
+            }
+        }
+
+        function ehDono(restaurante) {
+            return Boolean(estado.usuario && restaurante && restaurante.ownerId === estado.usuario.id);
+        }
+
+        function sairDaConta(avisar = true) {
+            estado.token = null;
+            estado.usuario = null;
+            estado.meus = [];
+            estado.painel = null;
+            estado.admin = null;
+            estado.minhaNota = null;
+            estado.formPrato = false;
+            estado.formRestaurante = false;
+            estado.editandoPrato = null;
+            salvarSessao();
+            carregarFavoritos();
+            renderTudo();
+            if (avisar) aviso('Você saiu da sua conta');
+        }
+
+        // Dados que dependem de estar logado: restaurantes do usuário, painel do dono e visão do admin
+        async function carregarDadosDaConta() {
+            if (!estado.token) return;
+
+            try {
+                estado.meus = await api('/restaurants/mine');
+                estado.painel = estado.meus.length ? await api('/restaurants/dashboard') : null;
+
+                if (estado.usuario && estado.usuario.role === 'ADMIN') {
+                    const [visao, todos] = await Promise.all([api('/admin/overview'), api('/admin/restaurants')]);
+                    estado.admin = { visao, todos };
+                } else {
+                    estado.admin = null;
+                }
+            } catch (erro) {
+                if (erro.status !== 401) aviso(erro.message, 'erro');
+            }
+        }
+
+        // Atualiza o usuário com o que está no banco (o perfil pode ter mudado)
+        async function atualizarUsuario() {
+            const dados = await api('/auth/me');
+            estado.usuario = dados.user;
+            salvarSessao();
+        }
+
+        // ===== Entrar / Criar conta =====
+        function definirModoConta(modo) {
+            estado.modoConta = modo;
+            const registro = modo === 'registro';
+            const form = $('formConta');
+
+            form.classList.toggle('form-login', !registro);
+            form.classList.toggle('form-registro', registro);
+
+            $('campoNome').hidden = !registro;
+            $('contaNome').required = registro;
+            $('contaSenha').autocomplete = registro ? 'new-password' : 'current-password';
+
+            $('tituloConta').textContent = registro ? 'Criar conta' : 'Entrar';
+            $('btnConta').textContent = registro ? 'Criar conta' : 'Entrar';
+            $('textoTroca').textContent = registro ? 'Já tem conta?' : 'Ainda não tem conta?';
+            $('btnTroca').textContent = registro ? 'Entrar' : 'Criar conta';
+        }
+
+        $('btnTroca').addEventListener('click', () => {
+            definirModoConta(estado.modoConta === 'login' ? 'registro' : 'login');
+        });
+
+        // Faz o login e guarda o token
+        async function fazerLogin(email, password) {
+            const dados = await api('/auth/login', { method: 'POST', body: { email, password } });
+            estado.token = dados.token;
+            estado.usuario = dados.user;
+            salvarSessao();
+        }
+
+        $('formConta').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const name = $('contaNome').value.trim();
+            const email = $('contaEmail').value.trim();
+            const password = $('contaSenha').value;
+            const botao = $('btnConta');
+
+            botao.disabled = true;
+            try {
+                if (estado.modoConta === 'registro') {
+                    await api('/auth/register', { method: 'POST', body: { name, email, password } });
+                }
+
+                // Depois de criar a conta, entra automaticamente
+                await fazerLogin(email, password);
+                $('formConta').reset();
+                definirModoConta('login');
+
+                carregarFavoritos();
+                await carregarDadosDaConta();
+                renderTudo();
+                aviso(`Bem-vindo, ${estado.usuario.name.split(' ')[0]}!`, 'ok');
+            } catch (erro) {
+                aviso(erro.message, 'erro');
+            } finally {
+                botao.disabled = false;
+            }
+        });
+
+        $('btnSair').addEventListener('click', () => sairDaConta());
+
+        // ===== Cabeçalho, conta e cadastro =====
+        function renderCabecalho() {
+            const logado = Boolean(estado.token && estado.usuario);
+            $('statusLogin').textContent = logado ? `Logado como ${estado.usuario.name}` : 'Você não está logado.';
+            $('btnSair').style.display = logado ? 'inline-block' : 'none';
+            $('blocoAcesso').hidden = logado;
+        }
+
+        function renderConta() {
+            const bloco = $('blocoConta');
+            const u = estado.usuario;
+
+            if (!estado.token || !u) {
+                bloco.hidden = true;
+                bloco.innerHTML = '';
+                return;
+            }
+
+            const avatar = u.imageUrl
+                ? `<img src="${esc(srcImagem(u.imageUrl))}" alt="Foto de perfil">`
+                : esc(iniciais(u.name));
+
+            const painel = estado.painel
+                ? `<div class="stats">
+                       <div class="stat"><strong>${estado.painel.restaurants}</strong><span>restaurantes</span></div>
+                       <div class="stat"><strong>${estado.painel.availableDishes}</strong><span>pratos</span></div>
+                       <div class="stat"><strong>${estado.painel.reviews}</strong><span>avaliações</span></div>
+                   </div>`
+                : '';
+
+            const meus = estado.meus.length
+                ? `<ul class="lista-simples">${estado.meus.map((r) => `
+                       <li><button type="button" class="linha" data-abrir="${r.id}">
+                           <span>${esc(r.name)} ${r.isActive === false ? '<small>(desativado)</small>' : ''}</span>
+                           <small>${esc(r.category)}</small>
+                       </button></li>`).join('')}</ul>`
+                : '<p class="hint">Você ainda não cadastrou nenhum restaurante.</p>';
+
+            const admin = estado.admin
+                ? `<h3 class="sub">Painel administrativo</h3>
+                   <div class="stats quatro">
+                       <div class="stat"><strong>${estado.admin.visao.users}</strong><span>usuários</span></div>
+                       <div class="stat"><strong>${estado.admin.visao.restaurants}</strong><span>restaurantes</span></div>
+                       <div class="stat"><strong>${estado.admin.visao.dishes}</strong><span>pratos</span></div>
+                       <div class="stat"><strong>${estado.admin.visao.reviews}</strong><span>avaliações</span></div>
+                   </div>
+                   <ul class="lista-simples" style="margin-top:10px">${estado.admin.todos.map((r) => `
+                       <li class="linha-info"><strong>${esc(r.name)}</strong>${r.isActive ? '' : ' <small>(desativado)</small>'}<br>
+                       <small>${r.owner ? esc(r.owner.name) + ' · ' + esc(r.owner.email) : 'sem proprietário'}</small></li>`).join('')}</ul>`
+                : '';
+
+            bloco.hidden = false;
+            bloco.innerHTML = `
+                <div class="perfil">
+                    <div class="avatar">
+                        <div class="avatar-moldura" id="avatarMoldura">${avatar}</div>
+                        <button type="button" class="btn-foto" data-acao="foto-perfil" aria-label="Trocar foto de perfil">📷</button>
+                    </div>
+                    <div>
+                        <h2>${esc(u.name)}</h2>
+                        <p>${esc(u.email)}</p>
+                        <span class="tag-papel">${esc(PAPEIS[u.role] || u.role)}</span>
+                    </div>
+                </div>
+                ${u.imageUrl ? '<button type="button" class="link-btn" data-acao="remover-perfil">Remover foto</button>' : ''}
+                ${painel}
+                <h3 class="sub">Meus restaurantes</h3>
+                ${meus}
+                ${admin}`;
+        }
+
+        function renderNovo() {
+            const logado = Boolean(estado.token);
+            $('formCadastro').hidden = !logado;
+            $('avisoNovo').hidden = logado;
+        }
+
+        $('formCadastro').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const botao = $('btnCadastrar');
+            botao.disabled = true;
+
+            try {
+                const novo = await api('/restaurants', {
+                    method: 'POST',
+                    body: { name: $('name').value.trim(), category: $('category').value.trim() }
+                });
+
+                estado.restaurantes.push(novo);
+                estado.meus.unshift({ ...novo, dishesCount: 0 });
+                $('formCadastro').reset();
+
+                // quem cadastra o primeiro restaurante passa a ser proprietário
+                await atualizarUsuario().catch(() => {});
+                await carregarDadosDaConta();
+
+                renderTudo();
+                aviso(`“${novo.name}” cadastrado. Agora monte o cardápio!`, 'ok');
+                abrirRestaurante(novo.id);
+            } catch (erro) {
+                aviso(erro.message, 'erro');
+            } finally {
+                botao.disabled = false;
+            }
+        });
+
+        // ===== Lista =====
+        async function carregarRestaurantes() {
+            $('listaRestaurantes').innerHTML = '<div class="esqueleto"></div><div class="esqueleto"></div><div class="esqueleto"></div>';
+            try {
+                estado.restaurantes = await api('/restaurants');
+                renderFiltros();
+                renderLista();
+            } catch (erro) {
+                console.error('Erro ao carregar dados:', erro);
+                $('contagem').textContent = '';
+                $('listaRestaurantes').innerHTML = `<div class="vazio"><strong>Servidor indisponível</strong>${esc(erro.message)}</div>`;
+            }
+        }
+
+        // Popular o filtro de categorias e as sugestões do cadastro dinamicamente
+        function renderFiltros() {
+            const todas = [...estado.restaurantes, ...estado.meus].map((r) => r.category).filter(Boolean);
+            const categorias = [...new Set(todas)].sort((a, b) => a.localeCompare(b, 'pt-BR'));
+            const doFiltro = [...new Set(estado.restaurantes.map((r) => r.category).filter(Boolean))]
+                .sort((a, b) => a.localeCompare(b, 'pt-BR'));
+
+            if (estado.categoria && !doFiltro.includes(estado.categoria)) estado.categoria = '';
+
+            const select = $('filtroCategory');
+            select.innerHTML = '<option value="">Todas as categorias</option>';
+            doFiltro.forEach((categoria) => {
+                const option = document.createElement('option');
+                option.value = categoria;
+                option.textContent = categoria;
+                option.selected = categoria === estado.categoria;
+                select.appendChild(option);
+            });
+
+            $('listaCategorias').innerHTML = categorias.map((c) => `<option value="${esc(c)}"></option>`).join('');
+        }
+
+        const ORDENACOES = {
+            padrao: null,
+            // restaurante sem avaliação vai para o fim, mesmo tendo nota 0
+            nota: (a, b) => (b.reviewsCount ? Number(b.rating) : -1) - (a.reviewsCount ? Number(a.rating) : -1)
+                || b.reviewsCount - a.reviewsCount,
+            nome: (a, b) => a.name.localeCompare(b.name, 'pt-BR'),
+            recentes: (a, b) => b.id - a.id
+        };
+
+        function restaurantesFiltrados() {
+            const busca = normalizar(estado.busca);
+            const lista = estado.restaurantes.filter((r) =>
+                (!estado.categoria || r.category === estado.categoria) &&
+                (!estado.soFavoritos || estado.favoritos.has(r.id)) &&
+                (!busca || normalizar(r.name).includes(busca) || normalizar(r.category).includes(busca))
+            );
+            return ORDENACOES[estado.ordem] ? [...lista].sort(ORDENACOES[estado.ordem]) : lista;
+        }
+
+        function cardRestaurante(r) {
+            const favorito = estado.favoritos.has(r.id);
+            return `
+                <article class="restaurant-card" role="button" tabindex="0" data-abrir="${r.id}">
+                    <div class="card-capa"><img src="${esc(imagemRestaurante(r))}" alt="" loading="lazy"></div>
+                    <button type="button" class="coracao ${favorito ? 'on' : ''}" data-fav="${r.id}"
+                        aria-label="${favorito ? 'Remover dos favoritos' : 'Favoritar'}" aria-pressed="${favorito}">${favorito ? '♥' : '♡'}</button>
+                    <div class="card-corpo">
+                        <h3>${esc(r.name)}</h3>
+                        <p style="margin:0"><span class="badge">${esc(r.category)}</span></p>
+                        ${notaCard(r)}
+                    </div>
+                </article>`;
+        }
+
+        function renderLista() {
+            const container = $('listaRestaurantes');
+            const lista = restaurantesFiltrados();
+            const visiveis = lista.slice(0, estado.pagina * POR_PAGINA);
+            const restantes = lista.length - visiveis.length;
+
+            $('contagem').textContent = `(${lista.length})`;
+
+            if (lista.length === 0) {
+                let mensagem = 'Seja o primeiro a cadastrar um restaurante.';
+                if (estado.soFavoritos && !estado.favoritos.size) mensagem = 'Toque no coração de um restaurante para salvá-lo aqui.';
+                else if (estado.restaurantes.length) mensagem = 'Nenhum restaurante combina com esta busca.';
+                container.innerHTML = `<div class="vazio"><strong>Nada por aqui</strong>${mensagem}</div>`;
+                return;
+            }
+
+            container.innerHTML = visiveis.map(cardRestaurante).join('') + (restantes > 0
+                ? `<button type="button" class="ghost carregar-mais" data-acao="mais">Carregar mais (${restantes} restante${restantes > 1 ? 's' : ''})</button>`
+                : '');
+        }
+
+        $('busca').addEventListener('input', (e) => { estado.busca = e.target.value; estado.pagina = 1; renderLista(); });
+        $('filtroCategory').addEventListener('change', (e) => { estado.categoria = e.target.value; estado.pagina = 1; renderLista(); });
+        $('ordem').addEventListener('change', (e) => { estado.ordem = e.target.value; estado.pagina = 1; renderLista(); });
+        $('btnFavoritos').addEventListener('click', () => {
+            estado.soFavoritos = !estado.soFavoritos;
+            estado.pagina = 1;
+            $('btnFavoritos').classList.toggle('ativo', estado.soFavoritos);
+            $('btnFavoritos').setAttribute('aria-pressed', String(estado.soFavoritos));
+            renderLista();
+        });
+
+        function alternarFavorito(id) {
+            if (estado.favoritos.has(id)) estado.favoritos.delete(id);
+            else estado.favoritos.add(id);
+            armazenamento.set(favoritosChave(), JSON.stringify([...estado.favoritos]));
+            renderLista();
+        }
+
+        // ===== Detalhe + cardápio =====
+        async function abrirRestaurante(id) {
+            const restaurante = estado.restaurantes.find((r) => r.id === id) || estado.meus.find((r) => r.id === id);
+            if (!restaurante) return;
+
+            estado.atual = restaurante;
+            estado.pratos = null;
+            estado.minhaNota = null;
+            estado.editandoPrato = null;
+            estado.formPrato = false;
+            estado.formRestaurante = false;
+
+            $('telaLista').hidden = true;
+            $('telaDetalhe').hidden = false;
+            renderDetalhe();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            const podeAvaliar = estado.token && !ehDono(restaurante);
+            const [pratos, nota] = await Promise.all([
+                api(`/restaurants/${id}/dishes`).catch((erro) => { aviso(erro.message, 'erro'); return []; }),
+                podeAvaliar ? api(`/restaurants/${id}/reviews/me`).catch(() => null) : null
+            ]);
+
+            // o usuário pode ter voltado ou aberto outro restaurante enquanto carregava
+            if (!estado.atual || estado.atual.id !== id) return;
+
+            estado.pratos = pratos;
+            estado.minhaNota = nota ? nota.myRating : null;
+            renderAvaliacao();
+            renderCardapio();
+        }
+
+        function voltarParaLista() {
+            estado.atual = null;
+            estado.pratos = null;
+            $('telaDetalhe').hidden = true;
+            $('telaLista').hidden = false;
+            renderLista();
+        }
+
+        function renderDetalhe() {
+            renderTopo();
+            renderAvaliacao();
+            renderGerenciar();
+            renderCardapio();
+        }
+
+        function renderTopo() {
+            const r = estado.atual;
+            if (!r) return;
+            const dono = ehDono(r);
+
+            const acoesCapa = dono ? `
+                <div class="capa-acoes">
+                    ${r.imageUrl ? '<button type="button" class="mini-btn perigo" data-acao="remover-capa" aria-label="Remover capa">🗑</button>' : ''}
+                    <button type="button" class="mini-btn" data-acao="foto-capa" aria-label="Enviar capa do restaurante">📷</button>
+                </div>` : '';
+
+            const contato = [r.address ? `📍 ${esc(r.address)}` : '', r.phone ? `📞 ${esc(r.phone)}` : ''].filter(Boolean).join(' &nbsp;·&nbsp; ');
+
+            $('detTopo').innerHTML = `
+                <button type="button" class="link-btn voltar" data-acao="voltar">← Voltar para a lista</button>
+                <div class="capa" id="capa"><img src="${esc(imagemRestaurante(r))}" alt="">${acoesCapa}</div>
+                <div class="det-cabecalho">
+                    <h2>${esc(r.name)}</h2>
+                    <div class="linha-meta">
+                        <span class="badge">${esc(r.category)}</span>
+                        ${notaInline(r)}
+                        ${dono ? '<span class="badge dono">Seu restaurante</span>' : ''}
+                        ${r.isActive === false ? '<span class="badge inativo">Desativado (não aparece na lista pública)</span>' : ''}
+                    </div>
+                    ${r.description ? `<p class="descricao">${esc(r.description)}</p>` : ''}
+                    ${contato ? `<p class="contato">${contato}</p>` : ''}
+                </div>`;
+        }
+
+        // Visitante é convidado a entrar; o dono não avalia o próprio restaurante
+        function renderAvaliacao() {
+            const r = estado.atual;
+            if (!r) return;
+
+            if (ehDono(r)) {
+                $('detAvaliacao').innerHTML = '<p class="hint">A nota do seu restaurante é a média das avaliações dos clientes.</p>';
+                return;
+            }
+
+            if (!estado.token) {
+                $('detAvaliacao').innerHTML = `
+                    <div class="avaliacao">
+                        <div><h4>Avalie este restaurante</h4><p>Entre na sua conta para dar a sua nota.</p></div>
+                        <button type="button" class="small" data-acao="ir-login">Entrar</button>
+                    </div>`;
+                return;
+            }
+
+            const estrelas = [1, 2, 3, 4, 5].map((n) => `
+                <button type="button" class="estrela ${estado.minhaNota >= n ? 'on' : ''}" data-nota="${n}"
+                    aria-label="${n} estrela${n > 1 ? 's' : ''}">★</button>`).join('');
+
+            $('detAvaliacao').innerHTML = `
+                <div class="avaliacao">
+                    <div>
+                        <h4>${estado.minhaNota ? 'Sua avaliação' : 'Avalie este restaurante'}</h4>
+                        <p>${estado.minhaNota ? 'Toque em outra estrela para mudar sua nota.' : 'Toque nas estrelas para dar a sua nota.'}</p>
+                    </div>
+                    <div class="estrelas">${estrelas}</div>
+                </div>`;
+        }
+
+        function valoresPrato() {
+            const prato = estado.editandoPrato && (estado.pratos || []).find((p) => p.id === estado.editandoPrato);
+            return prato || { name: '', category: '', price: '', description: '', isAvailable: true };
+        }
+
+        // Ferramentas do dono: editar dados, novo prato, excluir restaurante
+        function renderGerenciar() {
+            const r = estado.atual;
+            const alvo = $('detGerenciar');
+            if (!r || !ehDono(r)) { alvo.innerHTML = ''; return; }
+
+            const p = valoresPrato();
+            const editando = Boolean(estado.editandoPrato);
+
+            alvo.innerHTML = `
+                <div class="bloco">
+                    <div class="bloco-titulo">
+                        <h3>Gerenciar</h3>
+                        <div class="row-botoes">
+                            <button type="button" class="ghost small" data-acao="editar-restaurante">Editar informações</button>
+                            <button type="button" class="small" data-acao="novo-prato">+ Novo prato</button>
+                            <button type="button" class="danger small" data-acao="excluir-restaurante">Excluir restaurante</button>
+                        </div>
+                    </div>
+
+                    ${estado.formRestaurante ? `
+                    <form class="form-painel" id="formRestaurante">
+                        <h4>Informações do restaurante</h4>
+                        <div class="row">
+                            <div class="field"><label for="rNome">Nome</label>
+                                <input id="rNome" maxlength="150" value="${esc(r.name)}" required></div>
+                            <div class="field"><label for="rCategoria">Categoria</label>
+                                <input id="rCategoria" list="listaCategorias" maxlength="100" value="${esc(r.category)}" required></div>
+                        </div>
+                        <div class="field"><label for="rDescricao">Descrição</label>
+                            <textarea id="rDescricao" maxlength="1000" placeholder="Conte um pouco sobre o restaurante">${esc(r.description || '')}</textarea></div>
+                        <div class="row">
+                            <div class="field"><label for="rEndereco">Endereço</label>
+                                <input id="rEndereco" maxlength="255" value="${esc(r.address || '')}"></div>
+                            <div class="field"><label for="rTelefone">Telefone</label>
+                                <input id="rTelefone" maxlength="30" value="${esc(r.phone || '')}"></div>
+                        </div>
+                        <label class="check"><input type="checkbox" id="rAtivo" ${r.isActive === false ? '' : 'checked'}> Restaurante ativo (aparece na lista pública)</label>
+                        <div class="row-botoes">
+                            <button type="button" class="ghost" data-acao="cancelar-restaurante">Cancelar</button>
+                            <button type="submit" id="btnSalvarRestaurante">Salvar</button>
+                        </div>
+                    </form>` : ''}
+
+                    ${estado.formPrato ? `
+                    <form class="form-painel" id="formPrato">
+                        <h4>${editando ? 'Editar prato' : 'Novo prato'}</h4>
+                        <div class="field"><label for="pNome">Nome do prato</label>
+                            <input id="pNome" maxlength="150" placeholder="Ex: Lasanha à bolonhesa" value="${esc(p.name)}" required></div>
+                        <div class="row">
+                            <div class="field"><label for="pCategoria">Categoria</label>
+                                <input id="pCategoria" maxlength="100" placeholder="Ex: Massas" value="${esc(p.category)}" required></div>
+                            <div class="field"><label for="pPreco">Preço (R$)</label>
+                                <input id="pPreco" type="number" min="0" max="99999999" step="0.01" placeholder="42.90" value="${esc(p.price === '' ? '' : Number(p.price).toFixed(2))}" required></div>
+                        </div>
+                        <div class="field"><label for="pDescricao">Descrição</label>
+                            <textarea id="pDescricao" maxlength="1000" placeholder="Ingredientes, tamanho da porção...">${esc(p.description)}</textarea></div>
+                        <label class="check"><input type="checkbox" id="pDisponivel" ${p.isAvailable === false ? '' : 'checked'}> Disponível no cardápio</label>
+                        <div class="row-botoes">
+                            <button type="button" class="ghost" data-acao="cancelar-prato">Cancelar</button>
+                            <button type="submit" id="btnSalvarPrato">${editando ? 'Salvar' : 'Adicionar ao cardápio'}</button>
+                        </div>
+                    </form>` : ''}
+                </div>`;
+        }
+
+        function cardPrato(prato, dono) {
+            const acoesFoto = dono ? `
+                <div class="acoes">
+                    ${prato.imageUrl ? `<button type="button" class="mini-btn perigo" data-remover-foto-prato="${prato.id}" aria-label="Remover foto do prato">🗑</button>` : ''}
+                    <button type="button" class="mini-btn" data-foto-prato="${prato.id}" aria-label="Enviar foto do prato">📷</button>
+                </div>` : '';
+
+            const acoes = dono ? `
+                <span class="dish-acoes">
+                    <button type="button" class="ghost small" data-editar-prato="${prato.id}">Editar</button>
+                    <button type="button" class="danger small" data-excluir-prato="${prato.id}">Excluir</button>
+                </span>` : '';
+
+            return `
+                <article class="dish-card ${prato.isAvailable ? '' : 'indisponivel'}">
+                    <div class="dish-foto" id="prato-foto-${prato.id}">
+                        <img src="${esc(imagemPrato(prato, estado.atual))}" alt="${esc(prato.name)}" loading="lazy">
+                        ${acoesFoto}
+                    </div>
+                    <div class="dish-info">
+                        <span><span class="badge">${esc(prato.category)}</span>${prato.isAvailable ? '' : ' <span class="badge inativo">Indisponível</span>'}</span>
+                        <h4>${esc(prato.name)}</h4>
+                        <p>${esc(prato.description)}</p>
+                        <div class="dish-baixo"><span class="preco">${dinheiro(prato.price)}</span>${acoes}</div>
+                    </div>
+                </article>`;
+        }
+
+        function renderCardapio() {
+            const r = estado.atual;
+            if (!r) return;
+            const dono = ehDono(r);
+            const pratos = estado.pratos;
+
+            let conteudo;
+            if (pratos === null) {
+                conteudo = '<div class="esqueleto"></div><div class="esqueleto"></div>';
+            } else if (pratos.length === 0) {
+                conteudo = `<div class="vazio"><strong>Cardápio vazio</strong>${dono ? 'Toque em “+ Novo prato” para adicionar o primeiro.' : 'Este restaurante ainda não publicou pratos.'}</div>`;
+            } else {
+                conteudo = pratos.map((p) => cardPrato(p, dono)).join('');
+            }
+
+            $('detCardapio').innerHTML = `
+                <div class="bloco-titulo">
+                    <h3>Cardápio</h3>
+                    <span class="contagem">${pratos ? `${pratos.length} ${pratos.length === 1 ? 'prato' : 'pratos'}` : ''}</span>
+                </div>
+                <div class="pratos-grid">${conteudo}</div>`;
+        }
+
+        // Atualiza o restaurante em todos os lugares do estado onde ele aparece
+        function mesclarRestaurante(r) {
+            const mesclar = (lista) => lista.map((x) => (x.id === r.id ? { ...x, ...r } : x));
+            const naLista = estado.restaurantes.some((x) => x.id === r.id);
+
+            if (r.isActive === false) {
+                estado.restaurantes = estado.restaurantes.filter((x) => x.id !== r.id);
+            } else if (naLista) {
+                estado.restaurantes = mesclar(estado.restaurantes);
+            } else if (r.isActive === true && ehDono(r)) {
+                estado.restaurantes.push({ ...r });
+            }
+
+            estado.meus = mesclar(estado.meus);
+            if (estado.atual && estado.atual.id === r.id) estado.atual = { ...estado.atual, ...r };
+        }
+
+        // ===== Avaliação =====
+        async function avaliar(valor) {
+            const restaurante = estado.atual;
+            const anterior = estado.minhaNota;
+            estado.minhaNota = valor;
+            renderAvaliacao();
+
+            try {
+                const resultado = await api(`/restaurants/${restaurante.id}/reviews`, { method: 'POST', body: { rating: valor } });
+                mesclarRestaurante({ id: restaurante.id, rating: resultado.rating, reviewsCount: resultado.reviewsCount });
+                renderTopo();
+                renderLista();
+                aviso(anterior ? 'Avaliação atualizada' : 'Obrigado pela avaliação!', 'ok');
+            } catch (erro) {
+                estado.minhaNota = anterior;
+                renderAvaliacao();
+                aviso(erro.message, 'erro');
+            }
+        }
+
+        // ===== Restaurante: editar e excluir =====
+        document.addEventListener('submit', async (e) => {
+            if (e.target.id !== 'formRestaurante') return;
+            e.preventDefault();
+
+            const botao = $('btnSalvarRestaurante');
+            botao.disabled = true;
+            try {
+                const atualizado = await api(`/restaurants/${estado.atual.id}`, {
+                    method: 'PUT',
+                    body: {
+                        name: $('rNome').value.trim(),
+                        category: $('rCategoria').value.trim(),
+                        description: $('rDescricao').value.trim(),
+                        address: $('rEndereco').value.trim(),
+                        phone: $('rTelefone').value.trim(),
+                        isActive: $('rAtivo').checked
+                    }
+                });
+
+                mesclarRestaurante(atualizado);
+                estado.formRestaurante = false;
+                renderFiltros();
+                renderConta();
+                renderLista();
+                renderTopo();
+                renderGerenciar();
+                aviso('Restaurante atualizado', 'ok');
+            } catch (erro) {
+                aviso(erro.message, 'erro');
+                botao.disabled = false;
+            }
+        });
+
+        async function excluirRestaurante() {
+            const r = estado.atual;
+            if (!confirm(`Excluir "${r.name}"? O cardápio, as fotos e as avaliações também serão apagados. Isso não pode ser desfeito.`)) return;
+
+            try {
+                await api(`/restaurants/${r.id}`, { method: 'DELETE' });
+                estado.restaurantes = estado.restaurantes.filter((x) => x.id !== r.id);
+                estado.meus = estado.meus.filter((x) => x.id !== r.id);
+                await carregarDadosDaConta();
+                renderFiltros();
+                renderConta();
+                voltarParaLista();
+                aviso('Restaurante excluído', 'ok');
+            } catch (erro) {
+                aviso(erro.message, 'erro');
+            }
+        }
+
+        // ===== Pratos =====
+        document.addEventListener('submit', async (e) => {
+            if (e.target.id !== 'formPrato') return;
+            e.preventDefault();
+
+            const corpo = {
+                name: $('pNome').value.trim(),
+                category: $('pCategoria').value.trim(),
+                description: $('pDescricao').value.trim(),
+                price: $('pPreco').value,
+                isAvailable: $('pDisponivel').checked
+            };
+
+            const botao = $('btnSalvarPrato');
+            botao.disabled = true;
+            try {
+                if (estado.editandoPrato) {
+                    const prato = await api(`/dishes/${estado.editandoPrato}`, { method: 'PUT', body: corpo });
+                    estado.pratos = estado.pratos.map((p) => (p.id === prato.id ? prato : p));
+                    aviso('Prato atualizado', 'ok');
+                } else {
+                    const prato = await api(`/restaurants/${estado.atual.id}/dishes`, { method: 'POST', body: corpo });
+                    estado.pratos = [...(estado.pratos || []), prato];
+                    aviso('Prato adicionado. Toque na câmera para colocar a foto.', 'ok');
+                }
+
+                estado.editandoPrato = null;
+                estado.formPrato = false;
+                renderGerenciar();
+                renderCardapio();
+                await carregarDadosDaConta();
+                renderConta();
+            } catch (erro) {
+                aviso(erro.message, 'erro');
+                botao.disabled = false;
+            }
+        });
+
+        function editarPrato(id) {
+            estado.editandoPrato = id;
+            estado.formPrato = true;
+            estado.formRestaurante = false;
+            renderGerenciar();
+            $('formPrato').scrollIntoView({ behavior: 'smooth', block: 'center' });
+            setTimeout(() => $('pNome').focus({ preventScroll: true }), 250);
+        }
+
+        async function excluirPrato(id) {
+            const prato = (estado.pratos || []).find((p) => p.id === id);
+            if (!prato || !confirm(`Excluir "${prato.name}" do cardápio? Isso não pode ser desfeito.`)) return;
+
+            try {
+                await api(`/dishes/${id}`, { method: 'DELETE' });
+                estado.pratos = estado.pratos.filter((p) => p.id !== id);
+                if (estado.editandoPrato === id) { estado.editandoPrato = null; estado.formPrato = false; }
+                renderGerenciar();
+                renderCardapio();
+                await carregarDadosDaConta();
+                renderConta();
+                aviso('Prato excluído', 'ok');
+            } catch (erro) {
+                aviso(erro.message, 'erro');
+            }
+        }
+
+        // ===== Upload de imagens (perfil, capa e pratos) =====
+        const ROTAS_IMAGEM = {
+            usuario: () => '/auth/me/image',
+            capa: (id) => `/restaurants/${id}/image`,
+            prato: (id) => `/dishes/${id}/image`
+        };
+        const ROTULOS_IMAGEM = { usuario: 'Foto de perfil', capa: 'Capa do restaurante', prato: 'Foto do prato' };
+
+        function elementoDaImagem(alvo) {
+            if (alvo.tipo === 'usuario') return $('avatarMoldura');
+            if (alvo.tipo === 'capa') return $('capa');
+            return $(`prato-foto-${alvo.id}`);
+        }
+
+        function escolherImagem(alvo) {
+            estado.envio = alvo;
+            const input = $('arquivo');
+            input.value = '';
+            input.click();
+        }
+
+        // Atualiza o estado com o registro que a API devolveu e redesenha o que mostra a imagem
+        function aplicarImagem(alvo, atualizado) {
+            if (alvo.tipo === 'usuario') {
+                estado.usuario = { ...estado.usuario, imageUrl: atualizado.imageUrl };
+                salvarSessao();
+                renderConta();
+            } else if (alvo.tipo === 'prato') {
+                estado.pratos = estado.pratos.map((p) => (p.id === atualizado.id ? atualizado : p));
+                renderCardapio();
+            } else {
+                mesclarRestaurante(atualizado);
+                renderTopo();
+                renderLista();
+            }
+        }
+
+        $('arquivo').addEventListener('change', async (e) => {
+            const arquivo = e.target.files[0];
+            const alvo = estado.envio;
+            estado.envio = null;
+            if (!arquivo || !alvo) return;
+
+            if (!TIPOS_IMAGEM.includes(arquivo.type)) { aviso('Envie uma imagem JPEG, PNG ou WebP', 'erro'); return; }
+            if (arquivo.size > MAX_IMAGEM_MB * 1024 * 1024) { aviso(`A imagem deve ter no máximo ${MAX_IMAGEM_MB} MB`, 'erro'); return; }
+
+            const form = new FormData();
+            form.append('image', arquivo);
+
+            const elemento = elementoDaImagem(alvo);
+            if (elemento) elemento.classList.add('carregando');
+
+            try {
+                const atualizado = await api(ROTAS_IMAGEM[alvo.tipo](alvo.id), { method: 'POST', form });
+                aplicarImagem(alvo, atualizado);
+                aviso(`${ROTULOS_IMAGEM[alvo.tipo]} atualizada`, 'ok');
+            } catch (erro) {
+                if (elemento) elemento.classList.remove('carregando');
+                aviso(erro.message, 'erro');
+            }
+        });
+
+        async function removerImagem(alvo) {
+            if (!confirm(`Remover ${ROTULOS_IMAGEM[alvo.tipo].toLowerCase()}?`)) return;
+
+            const elemento = elementoDaImagem(alvo);
+            if (elemento) elemento.classList.add('carregando');
+
+            try {
+                const atualizado = await api(ROTAS_IMAGEM[alvo.tipo](alvo.id), { method: 'DELETE' });
+                aplicarImagem(alvo, atualizado);
+                aviso(`${ROTULOS_IMAGEM[alvo.tipo]} removida`, 'ok');
+            } catch (erro) {
+                if (elemento) elemento.classList.remove('carregando');
+                aviso(erro.message, 'erro');
+            }
+        }
+
+        // ===== Cliques (delegação de eventos) =====
+        document.addEventListener('click', (e) => {
+            const alvo = e.target.closest('button, [data-abrir], [data-fav]');
+            if (!alvo) return;
+
+            if (alvo.dataset.fav) { e.stopPropagation(); alternarFavorito(Number(alvo.dataset.fav)); return; }
+            if (alvo.dataset.nota) { avaliar(Number(alvo.dataset.nota)); return; }
+            if (alvo.dataset.editarPrato) { editarPrato(Number(alvo.dataset.editarPrato)); return; }
+            if (alvo.dataset.excluirPrato) { excluirPrato(Number(alvo.dataset.excluirPrato)); return; }
+            if (alvo.dataset.fotoPrato) { escolherImagem({ tipo: 'prato', id: Number(alvo.dataset.fotoPrato) }); return; }
+            if (alvo.dataset.removerFotoPrato) { removerImagem({ tipo: 'prato', id: Number(alvo.dataset.removerFotoPrato) }); return; }
+            if (alvo.dataset.abrir) { abrirRestaurante(Number(alvo.dataset.abrir)); return; }
+
+            switch (alvo.dataset.acao) {
+                case 'mais': estado.pagina++; renderLista(); break;
+                case 'voltar': voltarParaLista(); break;
+                case 'ir-login':
+                    $('blocoAcesso').scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    $('contaEmail').focus({ preventScroll: true });
+                    break;
+                case 'foto-perfil': escolherImagem({ tipo: 'usuario' }); break;
+                case 'remover-perfil': removerImagem({ tipo: 'usuario' }); break;
+                case 'foto-capa': escolherImagem({ tipo: 'capa', id: estado.atual.id }); break;
+                case 'remover-capa': removerImagem({ tipo: 'capa', id: estado.atual.id }); break;
+                case 'editar-restaurante':
+                    estado.formRestaurante = !estado.formRestaurante;
+                    if (estado.formRestaurante) { estado.formPrato = false; estado.editandoPrato = null; }
+                    renderGerenciar();
+                    break;
+                case 'cancelar-restaurante': estado.formRestaurante = false; renderGerenciar(); break;
+                case 'excluir-restaurante': excluirRestaurante(); break;
+                case 'novo-prato':
+                    estado.editandoPrato = null;
+                    estado.formPrato = !estado.formPrato;
+                    if (estado.formPrato) estado.formRestaurante = false;
+                    renderGerenciar();
+                    if (estado.formPrato) $('pNome').focus();
+                    break;
+                case 'cancelar-prato': estado.editandoPrato = null; estado.formPrato = false; renderGerenciar(); break;
+                default: break;
+            }
+        });
+
+        // Teclado: Enter/Espaço abre o card focado
+        document.addEventListener('keydown', (e) => {
+            if ((e.key === 'Enter' || e.key === ' ') && e.target.matches('.restaurant-card[data-abrir]')) {
+                e.preventDefault();
+                abrirRestaurante(Number(e.target.dataset.abrir));
+            }
+        });
+
+        // ===== Início =====
+        function renderTudo() {
+            renderCabecalho();
+            renderConta();
+            renderNovo();
+            renderFiltros();
+            renderLista();
+            if (estado.atual) renderDetalhe();
+        }
+
+        async function iniciar() {
+            carregarFavoritos();
+            renderCabecalho();
+            renderNovo();
+            definirModoConta('login');
+
+            const carregando = carregarRestaurantes();
+
+            // Sessão guardada: confere o token com o servidor e carrega os dados da conta
+            if (estado.token) {
+                try {
+                    await atualizarUsuario();
+                    carregarFavoritos();
+                    await carregarDadosDaConta();
+                } catch (erro) {
+                    if (erro.status !== 401) aviso(erro.message, 'erro');
+                }
+            }
+
+            await carregando;
+            renderTudo();
+        }
+
+        iniciar();
+    </script>
+</body>
+</html>

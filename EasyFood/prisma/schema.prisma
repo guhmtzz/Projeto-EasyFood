@@ -1,0 +1,77 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id          Int          @id @default(autoincrement())
+  name        String
+  email       String       @unique
+  password    String
+  // CUSTOMER (padrão), OWNER (cadastrou um restaurante) ou ADMIN (ADR-005)
+  role        String       @default("CUSTOMER")
+  imageUrl    String?
+  createdAt   DateTime     @default(now())
+  restaurants Restaurant[]
+  reviews     Review[]
+}
+
+model Restaurant {
+  id          Int      @id @default(autoincrement())
+  name        String
+  category    String
+  // Média das avaliações dos clientes (ADR-006); 0 enquanto não houver avaliações
+  rating      Float?
+  description String?
+  address     String?
+  phone       String?
+  imageUrl    String?
+  isActive    Boolean  @default(true)
+  // Opcional: restaurantes criados antes do controle de propriedade não têm dono
+  ownerId     Int?
+  owner       User?    @relation(fields: [ownerId], references: [id])
+  dishes      Dish[]
+  reviews     Review[]
+
+  @@index([ownerId])
+}
+
+model Dish {
+  id           Int        @id @default(autoincrement())
+  name         String
+  category     String
+  price        Decimal
+  imageUrl     String     @default("")
+  description  String
+  isAvailable  Boolean    @default(true)
+  restaurantId Int
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id])
+
+  @@index([restaurantId])
+}
+
+// Nota de 1 a 5 que um cliente dá a um restaurante; Restaurant.rating guarda a média
+model Review {
+  id           Int        @id @default(autoincrement())
+  rating       Int
+  userId       Int
+  restaurantId Int
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, restaurantId])
+  @@index([restaurantId])
+}
+
+model Activity {
+  id        Int      @id @default(autoincrement())
+  action    String
+  details   String?
+  createdAt DateTime @default(now())
+}
